@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: delivery
+
+  # DB 연결 — 3-3의 docker run 값과 똑같이
+  datasource:
+    url: jdbc:postgresql://localhost:5432/delivery
+    username: delivery
+    password: delivery1234
+
+  # JPA
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  #jwt 설정 / 가져다 쓸때, @Value("${jwt.secret.key}")
+jwt:
+  secret:
+    key: "7Iqk7YyM66W07YOA7L2U65Sp7YG065+9U3ByaW5n6rCV7J2Y7Yqc7YSw7LWc7JuQ67mI7J6F64uI64ukLg=="

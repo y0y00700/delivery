@@ -1,0 +1,24 @@
+package com.example.delivery.dto;
+
+import com.example.delivery.entity.UserType;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+public class UserLoginResponseDto {
+    private String loginId;
+    private String userName;
+    private String email;
+    private UserType userType;
+    private String token;
+
+    public UserLoginResponseDto(String loginId, String userName, String email, UserType userType) {
+        this.loginId = loginId;
+        this.userName = userName;
+        this.email = email;
+        this.userType = userType;
+    }
+}
