@@ -10,4 +10,14 @@ public enum UserType {
     OWNER("사장님");
 
     private final String description;
+
+    public String getAuthority() {
+        return this.description;
+    }
+
+    public static class Authority {
+        public static final String CUSTOMER = "CUSTOMER";
+        public static final String OWNER = "OWNER";
+    }
+
 }

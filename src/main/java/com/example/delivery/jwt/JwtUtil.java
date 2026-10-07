@@ -106,19 +106,23 @@ public class JwtUtil {
     }
 
     // HttpServletRequest 에서 Cookie Value : JWT 가져오기
+//    public String getTokenFromRequest(HttpServletRequest req) {
+//        Cookie[] cookies = req.getCookies();
+//        if(cookies != null) {
+//            for (Cookie cookie : cookies) {
+//                if (cookie.getName().equals(AUTHORIZATION_HEADER)) {
+//                    try {
+//                        return URLDecoder.decode(cookie.getValue(), "UTF-8"); // Encode 되어 넘어간 Value 다시 Decode
+//                    } catch (UnsupportedEncodingException e) {
+//                        return null;
+//                    }
+//                }
+//            }
+//        }
+//        return null;
+//    }
+
     public String getTokenFromRequest(HttpServletRequest req) {
-        Cookie[] cookies = req.getCookies();
-        if(cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(AUTHORIZATION_HEADER)) {
-                    try {
-                        return URLDecoder.decode(cookie.getValue(), "UTF-8"); // Encode 되어 넘어간 Value 다시 Decode
-                    } catch (UnsupportedEncodingException e) {
-                        return null;
-                    }
-                }
-            }
-        }
-        return null;
+        return req.getHeader(AUTHORIZATION_HEADER);
     }
 }

@@ -1,9 +1,7 @@
 package com.example.delivery.controller;
 
-import com.example.delivery.dto.UserLoginRequestDto;
-import com.example.delivery.dto.UserLoginResponseDto;
-import com.example.delivery.dto.UserRequestDto;
-import com.example.delivery.dto.UserResponseDto;
+import com.example.delivery.dto.user.UserRequestDto;
+import com.example.delivery.dto.user.UserResponseDto;
 import com.example.delivery.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+// 로그인이 필요한 요청은 Authorization: Bearer {토큰} 헤더로 보내고, 서버는 요청마다 필터에서 토큰을 검증
 public class UserController {
 
     private final UserService userService;
@@ -26,13 +25,11 @@ public class UserController {
         return ResponseEntity.ok(userService.register(userRequestDto));
     }
 
-    // 로그인 jwt 쿠키 생성 반환 상태코드 : 200
-    // 토큰 아이디 / 역할 / 만료시간
-    // 존재하지 않는 아이디 or 비밀번호 틀리면 401
-    @PostMapping("/api/users/login")
-    public ResponseEntity<UserLoginResponseDto> login(@RequestBody UserLoginRequestDto userLoginRequestDto){
-        return ResponseEntity.ok(userService.login(userLoginRequestDto));
+//    Spring Security Filter 영역에서 컨트롤 하므로 제거
+//    @PostMapping("/api/users/login")
+//    public ResponseEntity<UserLoginResponseDto> login(@RequestBody UserLoginRequestDto userLoginRequestDto){
+//        return ResponseEntity.ok(userService.login(userLoginRequestDto));
 //        헤더에 반환시,
 //        return ResponseEntity.ok().header(HttpHeaders.AUTHORIZATION, result.getToken()).build();
-    }
+//    }
 }

@@ -37,7 +37,6 @@ public class Menu extends BaseEntity{
         this.menuDesc = menuDesc;
         this.price = price;
         this.ownerId = ownerId;
-
     }
 
 }

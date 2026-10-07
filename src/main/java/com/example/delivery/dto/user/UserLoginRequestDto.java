@@ -1,4 +1,4 @@
-package com.example.delivery.dto;
+package com.example.delivery.dto.user;
 
 import com.example.delivery.entity.UserType;
 import jakarta.validation.constraints.NotBlank;
