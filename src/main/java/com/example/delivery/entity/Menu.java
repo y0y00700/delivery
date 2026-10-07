@@ -31,12 +31,26 @@ public class Menu extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name="owner_id", nullable = false)
     private User ownerId;
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     public Menu(String menuName, String menuDesc, int price, User ownerId) {
         this.menuName = menuName;
         this.menuDesc = menuDesc;
         this.price = price;
         this.ownerId = ownerId;
+    }
+
+    // 필드 변경 용 메서드 추가
+    public void update(String menuName, String menuDesc, int price) {
+        this.menuName = menuName;
+        this.menuDesc = menuDesc;
+        this.price = price;
+    }
+
+    // 상태 변경용 메서드 (삭제시,)
+    public void softDelete(){
+        this.deletedAt = LocalDateTime.now();
     }
 
 }
