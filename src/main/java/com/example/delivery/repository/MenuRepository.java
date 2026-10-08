@@ -2,10 +2,7 @@ package com.example.delivery.repository;
 
 import com.example.delivery.entity.Menu;
 import com.example.delivery.entity.User;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.lang.ScopedValue;
 import java.util.List;
 import java.util.Optional;
 
