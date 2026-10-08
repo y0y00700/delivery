@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MenuRepository extends JpaRepository<Menu,Long> {
-    Optional<Menu> findByMenuName(String menuName);
     // 동일 메뉴 이름 중복 체크
     boolean existsByOwnerIdAndMenuName(User ownerId, String menuName);
     // 삭제시, NULL 조건 (전체 조회)
