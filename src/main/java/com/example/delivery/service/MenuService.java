@@ -45,7 +45,7 @@ public class MenuService {
         // 한 가게에 동일 메뉴이름 중복 등록 x
         if(menuRepository.existsByOwnerIdAndMenuName(owner,requestMenuRegDto.getMenuName())){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 동일한 메뉴이름으로 등록하신 제품이 있습니다.");
-        };
+        }
 
         Menu menu = new Menu(
                 requestMenuRegDto.getMenuName(),
@@ -99,7 +99,7 @@ public class MenuService {
 
     // 메뉴 수정
     @Transactional
-    public ResponseMenuListDto menuUpdate(RequestMenuUpdateDto requestMenuUpdateDto,String loginId) {
+    public ResponseMenuListDto menuUpdate(Long menuId, RequestMenuUpdateDto requestMenuUpdateDto, String loginId) {
 
         User owner = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -114,7 +114,7 @@ public class MenuService {
         }
 
 
-        Menu menu = menuRepository.findById(requestMenuUpdateDto.getMenuId())
+        Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "해당 메뉴가 존재하지 않습니다."
@@ -154,6 +154,7 @@ public class MenuService {
         );
     }
 
+    @Transactional
     public void menuDelete(Long menuId, String loginId) {
         User owner = userRepository.findByLoginId(loginId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "인증된 사용자를 찾을 수 없습니다.")

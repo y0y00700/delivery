@@ -36,9 +36,11 @@ public class MenuController {
 
     // 메뉴 수정
     @PutMapping("/api/menus/{menuId}")
-    public ResponseEntity<ResponseMenuListDto> update(@RequestBody RequestMenuUpdateDto requestMenuUpdateDto
-                                                    , @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return ResponseEntity.ok(menuService.menuUpdate(requestMenuUpdateDto,userDetails.getUsername()));
+    public ResponseEntity<ResponseMenuListDto> update(
+            @PathVariable("menuId") Long menuId,
+            @Valid @RequestBody RequestMenuUpdateDto requestMenuUpdateDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return ResponseEntity.ok(menuService.menuUpdate(menuId, requestMenuUpdateDto, userDetails.getUsername()));
     }
 
     // 메뉴 삭제

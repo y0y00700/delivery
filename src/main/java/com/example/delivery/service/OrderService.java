@@ -1,10 +1,8 @@
 package com.example.delivery.service;
 
-import com.example.delivery.dto.menu.ResponseMenuListDto;
 import com.example.delivery.dto.order.RequestOrderCreateDto;
 import com.example.delivery.dto.order.ResponseOrderCreateDto;
 import com.example.delivery.dto.order.ResponseOrderListDto;
-import com.example.delivery.dto.user.UserResponseDto;
 import com.example.delivery.entity.*;
 import com.example.delivery.repository.MenuRepository;
 import com.example.delivery.repository.OrderRepository;
@@ -59,7 +57,7 @@ public class OrderService {
         orderRepository.save(order);
 
         return new ResponseOrderCreateDto(
-                order.getMenuId(),
+                order.getMenuId().getMenuId(),
                 order.getOrderStatus(),
                 order.getQuantity(),
                 order.getDeliveryAddr(),
@@ -81,7 +79,7 @@ public class OrderService {
             for(Order o : orders){
                 ResponseOrderListDto dto = new ResponseOrderListDto(
                     o.getOrderId(),
-                    o.getMenuId(),
+                    o.getMenuId().getMenuId(),
                     o.getOrderStatus(),
                     o.getQuantity(),
                     o.getDeliveryAddr(),
@@ -96,7 +94,7 @@ public class OrderService {
             for(Order o : orders){
                 ResponseOrderListDto dto = new ResponseOrderListDto(
                         o.getOrderId(),
-                        o.getMenuId(),
+                        o.getMenuId().getMenuId(),
                         o.getOrderStatus(),
                         o.getQuantity(),
                         o.getDeliveryAddr(),

@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 
 public class RequestMenuUpdateDto {
-    private Long menuId;
     @NotBlank(message = "메뉴 이름은 필수입니다.")
     private String menuName;
     private String menuDesc;
