@@ -1,0 +1,3075 @@
+{
+  "info": {
+    "name": "Delivery 5-1 수정 부분 재검증 (결제 제외)",
+    "description": "기존 컬렉션의 관련 요청 28개와 추가 검증 12개, 총 40개. 회원가입 4건 및 로그인 4건으로 독립된 데이터를 준비한다. 201, 공개 메뉴 조회, 주문 입력 검증·ID·총액, 역할별 목록, 삭제 메뉴 조회·수정·재삭제 404와 기존 주문 보존을 확인한다. 결제·주문 취소·주문 상태 변경 API는 실행하지 않는다. 이번 실행에서 생성한 메뉴 1건만 Soft Delete한다.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "paymentEnabled",
+      "value": "false",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 owner1 회원가입",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/users/registry",
+        "description": "과제 5-1 01 — owner1 회원가입\n기대 HTTP: [201]",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"loginId\": \"{{owner1}}\",\n  \"password\": \"{{password}}\",\n  \"userName\": \"P51 owner1\",\n  \"email\": \"{{owner1}}@example.com\",\n  \"userType\": \"OWNER\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "",
+              "const runId = 'p51_' + Date.now().toString(36);",
+              "pm.collectionVariables.set('runId', runId);",
+              "pm.collectionVariables.set('runResults', '[]');",
+              "['menuId','orderId','cancelOrderId','orderCreated','cancelOrderCreated','paid','accepted','completed','canceled','deleted',",
+              " 'owner1Token','owner2Token','cust1Token','cust2Token'].forEach(k => pm.collectionVariables.unset(k));",
+              "['owner1','owner2','cust1','cust2'].forEach(k => pm.collectionVariables.set(k,runId+'_'+k));",
+              "pm.collectionVariables.set('menuName', 'P51 김밥 ' + runId);",
+              "pm.collectionVariables.set('password', 'P51test!2026');",
+              "console.log('DELIVERY_RUN_ID', runId);",
+              "const CONFIG = {\"id\": \"01\", \"name\": \"owner1 회원가입\", \"codes\": [201], \"requires\": [], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"01\", \"name\": \"owner1 회원가입\", \"codes\": [201], \"requires\": [], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "check('비밀번호 미노출', () => pm.expect(JSON.stringify(body)).not.to.match(/password/i));",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 owner2 회원가입",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/users/registry",
+        "description": "과제 5-1 02 — owner2 회원가입\n기대 HTTP: [201]",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"loginId\": \"{{owner2}}\",\n  \"password\": \"{{password}}\",\n  \"userName\": \"P51 owner2\",\n  \"email\": \"{{owner2}}@example.com\",\n  \"userType\": \"OWNER\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"02\", \"name\": \"owner2 회원가입\", \"codes\": [201], \"requires\": [], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"02\", \"name\": \"owner2 회원가입\", \"codes\": [201], \"requires\": [], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "check('비밀번호 미노출', () => pm.expect(JSON.stringify(body)).not.to.match(/password/i));",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 cust1 회원가입",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/users/registry",
+        "description": "과제 5-1 03 — cust1 회원가입\n기대 HTTP: [201]",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"loginId\": \"{{cust1}}\",\n  \"password\": \"{{password}}\",\n  \"userName\": \"P51 cust1\",\n  \"email\": \"{{cust1}}@example.com\",\n  \"userType\": \"CUSTOMER\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"03\", \"name\": \"cust1 회원가입\", \"codes\": [201], \"requires\": [], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"03\", \"name\": \"cust1 회원가입\", \"codes\": [201], \"requires\": [], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "check('비밀번호 미노출', () => pm.expect(JSON.stringify(body)).not.to.match(/password/i));",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 cust2 회원가입",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/users/registry",
+        "description": "과제 5-1 04 — cust2 회원가입\n기대 HTTP: [201]",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"loginId\": \"{{cust2}}\",\n  \"password\": \"{{password}}\",\n  \"userName\": \"P51 cust2\",\n  \"email\": \"{{cust2}}@example.com\",\n  \"userType\": \"CUSTOMER\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"04\", \"name\": \"cust2 회원가입\", \"codes\": [201], \"requires\": [], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"04\", \"name\": \"cust2 회원가입\", \"codes\": [201], \"requires\": [], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "check('비밀번호 미노출', () => pm.expect(JSON.stringify(body)).not.to.match(/password/i));",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07a owner1 로그인 및 토큰 저장",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/users/login",
+        "description": "과제 5-1 07a — owner1 로그인 및 토큰 저장\n기대 HTTP: [200]",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"loginId\": \"{{owner1}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"07a\", \"name\": \"owner1 로그인 및 토큰 저장\", \"codes\": [200], \"requires\": [], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"07a\", \"name\": \"owner1 로그인 및 토큰 저장\", \"codes\": [200], \"requires\": [], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "",
+              "check('JWT 발급', () => pm.expect(body && body.token).to.match(/^Bearer [^.]+\\.[^.]+\\.[^.]+$/));",
+              "if (pm.response.code === 200 && body && typeof body.token === 'string') {",
+              "  pm.collectionVariables.set('owner1Token',body.token.startsWith('Bearer ') ? body.token : 'Bearer '+body.token);",
+              "}",
+              "",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07b owner2 로그인 및 토큰 저장",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/users/login",
+        "description": "과제 5-1 07b — owner2 로그인 및 토큰 저장\n기대 HTTP: [200]",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"loginId\": \"{{owner2}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"07b\", \"name\": \"owner2 로그인 및 토큰 저장\", \"codes\": [200], \"requires\": [], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"07b\", \"name\": \"owner2 로그인 및 토큰 저장\", \"codes\": [200], \"requires\": [], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "",
+              "check('JWT 발급', () => pm.expect(body && body.token).to.match(/^Bearer [^.]+\\.[^.]+\\.[^.]+$/));",
+              "if (pm.response.code === 200 && body && typeof body.token === 'string') {",
+              "  pm.collectionVariables.set('owner2Token',body.token.startsWith('Bearer ') ? body.token : 'Bearer '+body.token);",
+              "}",
+              "",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07c cust1 로그인 및 토큰 저장",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/users/login",
+        "description": "과제 5-1 07c — cust1 로그인 및 토큰 저장\n기대 HTTP: [200]",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"loginId\": \"{{cust1}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"07c\", \"name\": \"cust1 로그인 및 토큰 저장\", \"codes\": [200], \"requires\": [], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"07c\", \"name\": \"cust1 로그인 및 토큰 저장\", \"codes\": [200], \"requires\": [], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "",
+              "check('JWT 발급', () => pm.expect(body && body.token).to.match(/^Bearer [^.]+\\.[^.]+\\.[^.]+$/));",
+              "if (pm.response.code === 200 && body && typeof body.token === 'string') {",
+              "  pm.collectionVariables.set('cust1Token',body.token.startsWith('Bearer ') ? body.token : 'Bearer '+body.token);",
+              "}",
+              "",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07d cust2 로그인 및 토큰 저장",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/users/login",
+        "description": "과제 5-1 07d — cust2 로그인 및 토큰 저장\n기대 HTTP: [200]",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"loginId\": \"{{cust2}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"07d\", \"name\": \"cust2 로그인 및 토큰 저장\", \"codes\": [200], \"requires\": [], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"07d\", \"name\": \"cust2 로그인 및 토큰 저장\", \"codes\": [200], \"requires\": [], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "",
+              "check('JWT 발급', () => pm.expect(body && body.token).to.match(/^Bearer [^.]+\\.[^.]+\\.[^.]+$/));",
+              "if (pm.response.code === 200 && body && typeof body.token === 'string') {",
+              "  pm.collectionVariables.set('cust2Token',body.token.startsWith('Bearer ') ? body.token : 'Bearer '+body.token);",
+              "}",
+              "",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 토큰 없는 메뉴 등록",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/menus/registry",
+        "description": "과제 5-1 09 — 토큰 없는 메뉴 등록\n기대 HTTP: [401, 403]",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"menuName\": \"{{menuName}}\",\n  \"menuDesc\": \"Postman 5-1 테스트 데이터\",\n  \"price\": 3000\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"09\", \"name\": \"토큰 없는 메뉴 등록\", \"codes\": [401, 403], \"requires\": [], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"09\", \"name\": \"토큰 없는 메뉴 등록\", \"codes\": [401, 403], \"requires\": [], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 owner1 김밥 3000원 등록",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{owner1Token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/menus/registry",
+        "description": "과제 5-1 11 — owner1 김밥 3000원 등록\n기대 HTTP: [201]",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"menuName\": \"{{menuName}}\",\n  \"menuDesc\": \"Postman 5-1 테스트 데이터\",\n  \"price\": 3000\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"11\", \"name\": \"owner1 김밥 3000원 등록\", \"codes\": [201], \"requires\": [\"owner1Token\"], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"11\", \"name\": \"owner1 김밥 3000원 등록\", \"codes\": [201], \"requires\": [\"owner1Token\"], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "",
+              "check('메뉴 ID 및 가격', () => { pm.expect(body.menuId).to.be.a('number'); pm.expect(body.price).to.eql(3000); });",
+              "if ([200,201].includes(pm.response.code) && body && body.menuId) pm.collectionVariables.set('menuId',body.menuId);",
+              "",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "14a 비로그인 김밥 단건 조회",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/menus/{{menuId}}",
+        "description": "과제 5-1 14a — 비로그인 김밥 단건 조회\n기대 HTTP: [200]"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"14a\", \"name\": \"비로그인 김밥 단건 조회\", \"codes\": [200], \"requires\": [\"menuId\"], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"14a\", \"name\": \"비로그인 김밥 단건 조회\", \"codes\": [200], \"requires\": [\"menuId\"], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "",
+              "check('메뉴 일치', () => pm.expect(body.menuId).to.eql(Number(pm.collectionVariables.get('menuId'))));",
+              "",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "14b 비로그인 없는 메뉴 조회",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/menus/9223372036854775807",
+        "description": "과제 5-1 14b — 비로그인 없는 메뉴 조회\n기대 HTTP: [404]"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"14b\", \"name\": \"비로그인 없는 메뉴 조회\", \"codes\": [404], \"requires\": [], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"14b\", \"name\": \"비로그인 없는 메뉴 조회\", \"codes\": [404], \"requires\": [], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "15 다른 OWNER 메뉴 수정 거절",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{owner2Token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/menus/{{menuId}}",
+        "description": "과제 5-1 15 — 다른 OWNER 메뉴 수정 거절\n기대 HTTP: [403]",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"menuName\": \"{{menuName}}\",\n  \"menuDesc\": \"Postman 5-1 테스트 데이터\",\n  \"price\": 3500\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"15\", \"name\": \"다른 OWNER 메뉴 수정 거절\", \"codes\": [403], \"requires\": [\"menuId\", \"owner2Token\"], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"15\", \"name\": \"다른 OWNER 메뉴 수정 거절\", \"codes\": [403], \"requires\": [\"menuId\", \"owner2Token\"], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "16 본인 김밥 가격 3500원 수정",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{owner1Token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/menus/{{menuId}}",
+        "description": "과제 5-1 16 — 본인 김밥 가격 3500원 수정\n기대 HTTP: [200]",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"menuName\": \"{{menuName}}\",\n  \"menuDesc\": \"Postman 5-1 테스트 데이터\",\n  \"price\": 3500\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"16\", \"name\": \"본인 김밥 가격 3500원 수정\", \"codes\": [200], \"requires\": [\"menuId\", \"owner1Token\"], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"16\", \"name\": \"본인 김밥 가격 3500원 수정\", \"codes\": [200], \"requires\": [\"menuId\", \"owner1Token\"], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "check('가격 3500원', () => pm.expect(body.price).to.eql(3500));",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "17 OWNER 주문 생성 거절",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{owner1Token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/order/",
+        "description": "과제 5-1 17 — OWNER 주문 생성 거절\n기대 HTTP: [403]",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"menuId\": {{menuId}},\n  \"quantity\": 2,\n  \"deliveryAddr\": \"테스트 전용 가상주소 101호\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"17\", \"name\": \"OWNER 주문 생성 거절\", \"codes\": [403], \"requires\": [\"menuId\", \"owner1Token\"], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"17\", \"name\": \"OWNER 주문 생성 거절\", \"codes\": [403], \"requires\": [\"menuId\", \"owner1Token\"], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "18 cust1 김밥 2개 주문",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{cust1Token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/order/",
+        "description": "과제 5-1 18 — cust1 김밥 2개 주문\n기대 HTTP: [201]",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"menuId\": {{menuId}},\n  \"quantity\": 2,\n  \"deliveryAddr\": \"테스트 전용 가상주소 101호\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"18\", \"name\": \"cust1 김밥 2개 주문\", \"codes\": [201], \"requires\": [\"menuId\", \"cust1Token\"], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"18\", \"name\": \"cust1 김밥 2개 주문\", \"codes\": [201], \"requires\": [\"menuId\", \"cust1Token\"], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "",
+              "check('총액 7000원 · ORDERED', () => { pm.expect(body.orderPrice).to.eql(7000); pm.expect(body.orderStatus).to.eql('ORDERED'); });",
+              "check('생성된 주문 ID 반환', () => pm.expect(body && body.orderId).to.be.a('number'));",
+              "if ([200,201].includes(pm.response.code) && body && body.orderStatus === 'ORDERED') {",
+              "  pm.collectionVariables.set('orderCreated',true);",
+              "  if (body.orderId) pm.collectionVariables.set('orderId',body.orderId);",
+              "}",
+              "",
+              "check('주문 ID 양의 정수 · 메뉴 · 수량 · 주소', () => {",
+              "    pm.expect(body.orderId).to.be.a('number').above(0);",
+              "    pm.expect(Number.isInteger(body.orderId)).to.eql(true);",
+              "    pm.expect(body.menuId).to.eql(Number(pm.collectionVariables.get('menuId')));",
+              "    pm.expect(body.quantity).to.eql(2);",
+              "    pm.expect(body.deliveryAddr).to.eql('테스트 전용 가상주소 101호');",
+              "});",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "19 수량 0 주문 거절",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{cust1Token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/order/",
+        "description": "과제 5-1 19 — 수량 0 주문 거절\n기대 HTTP: [400]",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"menuId\": {{menuId}},\n  \"quantity\": 0,\n  \"deliveryAddr\": \"테스트 전용 가상주소 101호\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"19\", \"name\": \"수량 0 주문 거절\", \"codes\": [400], \"requires\": [\"menuId\", \"cust1Token\"], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"19\", \"name\": \"수량 0 주문 거절\", \"codes\": [400], \"requires\": [\"menuId\", \"cust1Token\"], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "V1 menuId 누락 거절",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/order/",
+        "auth": {
+          "type": "noauth"
+        },
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{cust1Token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "description": "이번 수정에 직접 관련된 추가 검증. 기대 HTTP: 400",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"quantity\": 2,\n  \"deliveryAddr\": \"테스트 전용 가상주소 101호\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "",
+              "const absent = [\"menuId\", \"cust1Token\"].filter(k => !pm.collectionVariables.get(k));",
+              "if (absent.length) {",
+              "    pm.test.skip('BLOCKED: ' + absent.join(', '), function () {});",
+              "    pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('V1 HTTP 400', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "V2 menuId null 거절",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/order/",
+        "auth": {
+          "type": "noauth"
+        },
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{cust1Token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "description": "이번 수정에 직접 관련된 추가 검증. 기대 HTTP: 400",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"menuId\": null,\n  \"quantity\": 2,\n  \"deliveryAddr\": \"테스트 전용 가상주소 101호\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "",
+              "const absent = [\"menuId\", \"cust1Token\"].filter(k => !pm.collectionVariables.get(k));",
+              "if (absent.length) {",
+              "    pm.test.skip('BLOCKED: ' + absent.join(', '), function () {});",
+              "    pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('V2 HTTP 400', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "V3 quantity 누락 거절",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/order/",
+        "auth": {
+          "type": "noauth"
+        },
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{cust1Token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "description": "이번 수정에 직접 관련된 추가 검증. 기대 HTTP: 400",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"menuId\": {{menuId}},\n  \"deliveryAddr\": \"테스트 전용 가상주소 101호\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "",
+              "const absent = [\"menuId\", \"cust1Token\"].filter(k => !pm.collectionVariables.get(k));",
+              "if (absent.length) {",
+              "    pm.test.skip('BLOCKED: ' + absent.join(', '), function () {});",
+              "    pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('V3 HTTP 400', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "V4 quantity null 거절",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/order/",
+        "auth": {
+          "type": "noauth"
+        },
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{cust1Token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "description": "이번 수정에 직접 관련된 추가 검증. 기대 HTTP: 400",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"menuId\": {{menuId}},\n  \"quantity\": null,\n  \"deliveryAddr\": \"테스트 전용 가상주소 101호\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "",
+              "const absent = [\"menuId\", \"cust1Token\"].filter(k => !pm.collectionVariables.get(k));",
+              "if (absent.length) {",
+              "    pm.test.skip('BLOCKED: ' + absent.join(', '), function () {});",
+              "    pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('V4 HTTP 400', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "V5 음수 수량 거절",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/order/",
+        "auth": {
+          "type": "noauth"
+        },
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{cust1Token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "description": "이번 수정에 직접 관련된 추가 검증. 기대 HTTP: 400",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"menuId\": {{menuId}},\n  \"quantity\": -1,\n  \"deliveryAddr\": \"테스트 전용 가상주소 101호\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "",
+              "const absent = [\"menuId\", \"cust1Token\"].filter(k => !pm.collectionVariables.get(k));",
+              "if (absent.length) {",
+              "    pm.test.skip('BLOCKED: ' + absent.join(', '), function () {});",
+              "    pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('V5 HTTP 400', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "V6 주소 누락 거절",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/order/",
+        "auth": {
+          "type": "noauth"
+        },
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{cust1Token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "description": "이번 수정에 직접 관련된 추가 검증. 기대 HTTP: 400",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"menuId\": {{menuId}},\n  \"quantity\": 2\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "",
+              "const absent = [\"menuId\", \"cust1Token\"].filter(k => !pm.collectionVariables.get(k));",
+              "if (absent.length) {",
+              "    pm.test.skip('BLOCKED: ' + absent.join(', '), function () {});",
+              "    pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('V6 HTTP 400', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "V7 주소 null 거절",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/order/",
+        "auth": {
+          "type": "noauth"
+        },
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{cust1Token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "description": "이번 수정에 직접 관련된 추가 검증. 기대 HTTP: 400",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"menuId\": {{menuId}},\n  \"quantity\": 2,\n  \"deliveryAddr\": null\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "",
+              "const absent = [\"menuId\", \"cust1Token\"].filter(k => !pm.collectionVariables.get(k));",
+              "if (absent.length) {",
+              "    pm.test.skip('BLOCKED: ' + absent.join(', '), function () {});",
+              "    pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('V7 HTTP 400', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "V8 공백 주소 거절",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/order/",
+        "auth": {
+          "type": "noauth"
+        },
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{cust1Token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "description": "이번 수정에 직접 관련된 추가 검증. 기대 HTTP: 400",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"menuId\": {{menuId}},\n  \"quantity\": 2,\n  \"deliveryAddr\": \"   \"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "",
+              "const absent = [\"menuId\", \"cust1Token\"].filter(k => !pm.collectionVariables.get(k));",
+              "if (absent.length) {",
+              "    pm.test.skip('BLOCKED: ' + absent.join(', '), function () {});",
+              "    pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('V8 HTTP 400', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "V9 없는 메뉴 주문 거절",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/order/",
+        "auth": {
+          "type": "noauth"
+        },
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{cust1Token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "description": "이번 수정에 직접 관련된 추가 검증. 기대 HTTP: 404",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"menuId\": 9223372036854775807,\n  \"quantity\": 2,\n  \"deliveryAddr\": \"테스트 전용 가상주소 101호\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "",
+              "const absent = [\"menuId\", \"cust1Token\"].filter(k => !pm.collectionVariables.get(k));",
+              "if (absent.length) {",
+              "    pm.test.skip('BLOCKED: ' + absent.join(', '), function () {});",
+              "    pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('V9 HTTP 404', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "20a cust1 주문 목록 범위",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{cust1Token}}"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/order/retrieve",
+        "description": "과제 5-1 20a — cust1 주문 목록 범위\n기대 HTTP: [200]"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"20a\", \"name\": \"cust1 주문 목록 범위\", \"codes\": [200], \"requires\": [\"cust1Token\"], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"20a\", \"name\": \"cust1 주문 목록 범위\", \"codes\": [200], \"requires\": [\"cust1Token\"], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "check('주문 1건', () => pm.expect(body).to.be.an('array').with.lengthOf(1));check('이번 메뉴만 조회', () => pm.expect(body.every(o => o.menuId == pm.collectionVariables.get('menuId'))).to.eql(true));",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "20b cust2 주문 목록 범위",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{cust2Token}}"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/order/retrieve",
+        "description": "과제 5-1 20b — cust2 주문 목록 범위\n기대 HTTP: [200]"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"20b\", \"name\": \"cust2 주문 목록 범위\", \"codes\": [200], \"requires\": [\"cust2Token\"], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"20b\", \"name\": \"cust2 주문 목록 범위\", \"codes\": [200], \"requires\": [\"cust2Token\"], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "check('주문 0건', () => pm.expect(body).to.be.an('array').with.lengthOf(0));",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "21a owner1 주문 목록 범위",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{owner1Token}}"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/order/retrieve",
+        "description": "과제 5-1 21a — owner1 주문 목록 범위\n기대 HTTP: [200]"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"21a\", \"name\": \"owner1 주문 목록 범위\", \"codes\": [200], \"requires\": [\"owner1Token\"], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"21a\", \"name\": \"owner1 주문 목록 범위\", \"codes\": [200], \"requires\": [\"owner1Token\"], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "check('주문 1건', () => pm.expect(body).to.be.an('array').with.lengthOf(1));check('이번 메뉴만 조회', () => pm.expect(body.every(o => o.menuId == pm.collectionVariables.get('menuId'))).to.eql(true));",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "21b owner2 주문 목록 범위",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{owner2Token}}"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/order/retrieve",
+        "description": "과제 5-1 21b — owner2 주문 목록 범위\n기대 HTTP: [200]"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"21b\", \"name\": \"owner2 주문 목록 범위\", \"codes\": [200], \"requires\": [\"owner2Token\"], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"21b\", \"name\": \"owner2 주문 목록 범위\", \"codes\": [200], \"requires\": [\"owner2Token\"], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "check('주문 0건', () => pm.expect(body).to.be.an('array').with.lengthOf(0));",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "30 취소용 새 주문 1개",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{cust1Token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/order/",
+        "description": "과제 5-1 30 — 취소용 새 주문 1개\n기대 HTTP: [201]",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"menuId\": {{menuId}},\n  \"quantity\": 1,\n  \"deliveryAddr\": \"테스트 전용 가상주소 101호\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"30\", \"name\": \"취소용 새 주문 1개\", \"codes\": [201], \"requires\": [\"menuId\", \"cust1Token\"], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"30\", \"name\": \"취소용 새 주문 1개\", \"codes\": [201], \"requires\": [\"menuId\", \"cust1Token\"], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "",
+              "check('ORDERED · 3500원', () => { pm.expect(body.orderStatus).to.eql('ORDERED'); pm.expect(body.orderPrice).to.eql(3500); });",
+              "if ([200,201].includes(pm.response.code) && body && body.orderStatus==='ORDERED') {",
+              "  pm.collectionVariables.set('cancelOrderCreated',true);",
+              "  if (body.orderId) pm.collectionVariables.set('cancelOrderId',body.orderId);",
+              "}",
+              "",
+              "check('주문 ID 양의 정수 · 메뉴 · 수량 · 주소', () => {",
+              "    pm.expect(body.orderId).to.be.a('number').above(0);",
+              "    pm.expect(Number.isInteger(body.orderId)).to.eql(true);",
+              "    pm.expect(body.menuId).to.eql(Number(pm.collectionVariables.get('menuId')));",
+              "    pm.expect(body.quantity).to.eql(1);",
+              "    pm.expect(body.deliveryAddr).to.eql('테스트 전용 가상주소 101호');",
+              "});",
+              "check('두 주문의 ID 구분', () => pm.expect(String(body.orderId)).not.to.eql(String(pm.collectionVariables.get('orderId'))));",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "34 다른 OWNER 메뉴 삭제 거절",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{owner2Token}}"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/menus/{{menuId}}",
+        "description": "과제 5-1 34 — 다른 OWNER 메뉴 삭제 거절\n기대 HTTP: [403]"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"34\", \"name\": \"다른 OWNER 메뉴 삭제 거절\", \"codes\": [403], \"requires\": [\"menuId\", \"owner2Token\"], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"34\", \"name\": \"다른 OWNER 메뉴 삭제 거절\", \"codes\": [403], \"requires\": [\"menuId\", \"owner2Token\"], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "35 본인 메뉴 Soft Delete",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{owner1Token}}"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/menus/{{menuId}}",
+        "description": "과제 5-1 35 — 본인 메뉴 Soft Delete\n기대 HTTP: [200, 204]"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"35\", \"name\": \"본인 메뉴 Soft Delete\", \"codes\": [200, 204], \"requires\": [\"menuId\", \"owner1Token\"], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"35\", \"name\": \"본인 메뉴 Soft Delete\", \"codes\": [200, 204], \"requires\": [\"menuId\", \"owner1Token\"], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "if ([200,204].includes(pm.response.code)) pm.collectionVariables.set('deleted',true);",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "37 삭제된 메뉴 단건 조회 거절",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{cust1Token}}"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/menus/{{menuId}}",
+        "description": "과제 5-1 37 — 삭제된 메뉴 단건 조회 거절\n기대 HTTP: [404]"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"37\", \"name\": \"삭제된 메뉴 단건 조회 거절\", \"codes\": [404], \"requires\": [\"menuId\", \"deleted\", \"cust1Token\"], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"37\", \"name\": \"삭제된 메뉴 단건 조회 거절\", \"codes\": [404], \"requires\": [\"menuId\", \"deleted\", \"cust1Token\"], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "D1 비로그인 삭제 메뉴 조회 거절",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/menus/{{menuId}}",
+        "auth": {
+          "type": "noauth"
+        },
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "description": "이번 수정에 직접 관련된 추가 검증. 기대 HTTP: 404"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "",
+              "const absent = [\"menuId\", \"deleted\"].filter(k => !pm.collectionVariables.get(k));",
+              "if (absent.length) {",
+              "    pm.test.skip('BLOCKED: ' + absent.join(', '), function () {});",
+              "    pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('D1 HTTP 404', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "D2 삭제 메뉴 수정 거절",
+      "request": {
+        "method": "PUT",
+        "url": "{{baseUrl}}/api/menus/{{menuId}}",
+        "auth": {
+          "type": "noauth"
+        },
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{owner1Token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "description": "이번 수정에 직접 관련된 추가 검증. 기대 HTTP: 404",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"menuName\": \"{{menuName}}\",\n  \"menuDesc\": \"삭제 후 수정 금지 확인\",\n  \"price\": 9999\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "",
+              "const absent = [\"menuId\", \"owner1Token\", \"deleted\"].filter(k => !pm.collectionVariables.get(k));",
+              "if (absent.length) {",
+              "    pm.test.skip('BLOCKED: ' + absent.join(', '), function () {});",
+              "    pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('D2 HTTP 404', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "D3 삭제 메뉴 재삭제 거절",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/api/menus/{{menuId}}",
+        "auth": {
+          "type": "noauth"
+        },
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{owner1Token}}"
+          }
+        ],
+        "description": "이번 수정에 직접 관련된 추가 검증. 기대 HTTP: 404"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "",
+              "const absent = [\"menuId\", \"owner1Token\", \"deleted\"].filter(k => !pm.collectionVariables.get(k));",
+              "if (absent.length) {",
+              "    pm.test.skip('BLOCKED: ' + absent.join(', '), function () {});",
+              "    pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('D3 HTTP 404', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "38 삭제된 메뉴 주문 거절",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{cust1Token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/order/",
+        "description": "과제 5-1 38 — 삭제된 메뉴 주문 거절\n기대 HTTP: [404]",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"menuId\": {{menuId}},\n  \"quantity\": 1,\n  \"deliveryAddr\": \"테스트 전용 가상주소 101호\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"38\", \"name\": \"삭제된 메뉴 주문 거절\", \"codes\": [404], \"requires\": [\"menuId\", \"deleted\", \"cust1Token\"], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"38\", \"name\": \"삭제된 메뉴 주문 거절\", \"codes\": [404], \"requires\": [\"menuId\", \"deleted\", \"cust1Token\"], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "39a cust1 삭제 메뉴의 기존 주문 유지",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{cust1Token}}"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/order/retrieve",
+        "description": "과제 5-1 39a — cust1 삭제 메뉴의 기존 주문 유지\n기대 HTTP: [200]"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"39a\", \"name\": \"cust1 삭제 메뉴의 기존 주문 유지\", \"codes\": [200], \"requires\": [\"orderId\", \"cancelOrderId\", \"deleted\", \"cust1Token\"], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"39a\", \"name\": \"cust1 삭제 메뉴의 기존 주문 유지\", \"codes\": [200], \"requires\": [\"orderId\", \"cancelOrderId\", \"deleted\", \"cust1Token\"], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "",
+              "check('기존 주문 2건 유지', () => {",
+              "  const ids=body.map(o=>String(o.orderId));",
+              "  pm.expect(ids).to.include(String(pm.collectionVariables.get('orderId')));",
+              "  pm.expect(ids).to.include(String(pm.collectionVariables.get('cancelOrderId')));",
+              "});",
+              "",
+              "check('삭제 후 주문 상태 · 금액 · 수량 보존', () => {",
+              "    pm.expect(body).to.be.an('array').with.lengthOf(2);",
+              "    const first = body.find(o => String(o.orderId) === String(pm.collectionVariables.get('orderId')));",
+              "    const second = body.find(o => String(o.orderId) === String(pm.collectionVariables.get('cancelOrderId')));",
+              "    pm.expect(first.orderStatus).to.eql('ORDERED');",
+              "    pm.expect(first.orderPrice).to.eql(7000);",
+              "    pm.expect(first.quantity).to.eql(2);",
+              "    pm.expect(second.orderStatus).to.eql('ORDERED');",
+              "    pm.expect(second.orderPrice).to.eql(3500);",
+              "    pm.expect(second.quantity).to.eql(1);",
+              "    pm.expect(body.every(o => o.menuId == pm.collectionVariables.get('menuId'))).to.eql(true);",
+              "});",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "39b owner1 삭제 메뉴의 기존 주문 유지",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{owner1Token}}"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/api/order/retrieve",
+        "description": "과제 5-1 39b — owner1 삭제 메뉴의 기존 주문 유지\n기대 HTTP: [200]"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"39b\", \"name\": \"owner1 삭제 메뉴의 기존 주문 유지\", \"codes\": [200], \"requires\": [\"orderId\", \"cancelOrderId\", \"deleted\", \"owner1Token\"], \"payment\": false};",
+              "",
+              "const requirements = CONFIG.requires || [];",
+              "const absent = requirements.filter(k => !pm.collectionVariables.get(k));",
+              "let reason = '';",
+              "let state = 'BLOCKED';",
+              "if (CONFIG.payment && pm.collectionVariables.get('paymentEnabled') !== 'true') {",
+              "  state = 'NOT_IMPLEMENTED'; reason = '결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.';",
+              "} else if (absent.length) {",
+              "  reason = '선행 조건 미충족: ' + absent.join(', ');",
+              "}",
+              "if (reason) {",
+              "  const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "  records.push({id: CONFIG.id, name: CONFIG.name, outcome: state, reason});",
+              "  pm.collectionVariables.set('runResults', JSON.stringify(records));",
+              "  console.warn(CONFIG.id + ' ' + state + ': ' + reason);",
+              "  pm.test.skip(CONFIG.id + ' ' + state + ': ' + reason, function(){});",
+              "  pm.execution.skipRequest();",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const CONFIG = {\"id\": \"39b\", \"name\": \"owner1 삭제 메뉴의 기존 주문 유지\", \"codes\": [200], \"requires\": [\"orderId\", \"cancelOrderId\", \"deleted\", \"owner1Token\"], \"payment\": false};",
+              "",
+              "let body;",
+              "try { body = pm.response.json(); } catch (_) { body = null; }",
+              "const checks = [];",
+              "function check(label, fn) {",
+              "  let error = '';",
+              "  try { fn(); } catch (e) { error = e.message || String(e); }",
+              "  checks.push({name: label, pass: !error, error});",
+              "  pm.test(CONFIG.id + ' ' + label, function () { if (error) throw new Error(error); });",
+              "}",
+              "check('HTTP ' + CONFIG.codes.join(' / '), () => pm.expect(pm.response.code).to.be.oneOf(CONFIG.codes));",
+              "",
+              "check('기존 주문 2건 유지', () => {",
+              "  const ids=body.map(o=>String(o.orderId));",
+              "  pm.expect(ids).to.include(String(pm.collectionVariables.get('orderId')));",
+              "  pm.expect(ids).to.include(String(pm.collectionVariables.get('cancelOrderId')));",
+              "});",
+              "",
+              "check('삭제 후 주문 상태 · 금액 · 수량 보존', () => {",
+              "    pm.expect(body).to.be.an('array').with.lengthOf(2);",
+              "    const first = body.find(o => String(o.orderId) === String(pm.collectionVariables.get('orderId')));",
+              "    const second = body.find(o => String(o.orderId) === String(pm.collectionVariables.get('cancelOrderId')));",
+              "    pm.expect(first.orderStatus).to.eql('ORDERED');",
+              "    pm.expect(first.orderPrice).to.eql(7000);",
+              "    pm.expect(first.quantity).to.eql(2);",
+              "    pm.expect(second.orderStatus).to.eql('ORDERED');",
+              "    pm.expect(second.orderPrice).to.eql(3500);",
+              "    pm.expect(second.quantity).to.eql(1);",
+              "    pm.expect(body.every(o => o.menuId == pm.collectionVariables.get('menuId'))).to.eql(true);",
+              "});",
+              "const records = JSON.parse(pm.collectionVariables.get('runResults') || '[]');",
+              "records.push({id: CONFIG.id, name: CONFIG.name, status: pm.response.code,",
+              "  outcome: checks.every(c => c.pass) ? 'PASS' : 'FAIL', checks});",
+              "pm.collectionVariables.set('runResults', JSON.stringify(records));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

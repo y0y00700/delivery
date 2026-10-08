@@ -1,0 +1,35 @@
+BEGIN
+ database_name |       postgres_version
+---------------+-------------------------------
+ delivery      | 18.6 (Debian 18.6-1.pgdg13+2)
+(1 row)
+
+ user_id |      login_id       | user_type | bcrypt_format | created_at_set | modified_at_set
+---------+---------------------+-----------+---------------+----------------+-----------------
+       1 | p51_muz8avk3_owner1 | OWNER     | t             | t              | t
+       2 | p51_muz8avk3_owner2 | OWNER     | t             | t              | t
+       3 | p51_muz8avk3_cust1  | CUSTOMER  | t             | t              | t
+       4 | p51_muz8avk3_cust2  | CUSTOMER  | t             | t              | t
+(4 rows)
+
+ menu_id | price | soft_deleted | created_at_set | modified_at_set | modification_recorded
+---------+-------+--------------+----------------+-----------------+-----------------------
+       1 |  3500 | t            | t              | t               | t
+(1 row)
+
+ order_id | menu_id | order_status | quantity | order_price | created_at_set | modified_at_set
+----------+---------+--------------+----------+-------------+----------------+-----------------
+(0 rows)
+
+ table_name | column_name  |     data_type
+------------+--------------+-------------------
+ orders     | order_status | character varying
+ users      | user_type    | character varying
+(2 rows)
+
+ payments_table_exists
+-----------------------
+ f
+(1 row)
+
+COMMIT

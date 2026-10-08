@@ -1,0 +1,1015 @@
+{
+  "tool": "Postman CLI 1.70.0",
+  "startedAt": "2026-10-08T16:42:20.703000+09:00",
+  "runId": "p51_muz8avk3",
+  "environment": {
+    "baseUrl": "http://localhost:8080",
+    "database": "PostgreSQL 18.6",
+    "container": "delivery-db",
+    "java": "21.0.12.1",
+    "springBoot": "4.1.1"
+  },
+  "nativeSummary": {
+    "iterations": {
+      "executed": 1,
+      "errors": 0
+    },
+    "executedRequests": {
+      "executed": 34,
+      "errors": 0
+    },
+    "prerequestScripts": {
+      "executed": 53,
+      "errors": 0
+    },
+    "postresponseScripts": {
+      "executed": 34,
+      "errors": 0
+    },
+    "tests": {
+      "executed": 75,
+      "failed": 19,
+      "passed": 37,
+      "skipped": 19
+    },
+    "timeStats": {
+      "responseAverage": 109.70588235294116,
+      "responseMin": 5,
+      "responseMax": 1510,
+      "responseStandardDeviation": 253.86153351914527
+    }
+  },
+  "runError": null,
+  "requestOutcomes": {
+    "FAIL": 15,
+    "PASS": 19,
+    "BLOCKED": 15,
+    "NOT_IMPLEMENTED": 4
+  },
+  "assignmentStepOutcomes": {
+    "FAIL": 14,
+    "PASS": 13,
+    "BLOCKED": 8,
+    "NOT_IMPLEMENTED": 4
+  },
+  "requests": [
+    {
+      "id": "01",
+      "name": "owner1 회원가입",
+      "helper": false,
+      "method": "POST",
+      "status": 200,
+      "outcome": "FAIL",
+      "reason": "expected 200 to be one of [ 201 ]",
+      "checks": [
+        {
+          "name": "01 HTTP 201",
+          "status": "failed",
+          "error": "expected 200 to be one of [ 201 ]"
+        },
+        {
+          "name": "01 비밀번호 미노출",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "name": "owner2 회원가입",
+      "helper": false,
+      "method": "POST",
+      "status": 200,
+      "outcome": "FAIL",
+      "reason": "expected 200 to be one of [ 201 ]",
+      "checks": [
+        {
+          "name": "02 HTTP 201",
+          "status": "failed",
+          "error": "expected 200 to be one of [ 201 ]"
+        },
+        {
+          "name": "02 비밀번호 미노출",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "name": "cust1 회원가입",
+      "helper": false,
+      "method": "POST",
+      "status": 200,
+      "outcome": "FAIL",
+      "reason": "expected 200 to be one of [ 201 ]",
+      "checks": [
+        {
+          "name": "03 HTTP 201",
+          "status": "failed",
+          "error": "expected 200 to be one of [ 201 ]"
+        },
+        {
+          "name": "03 비밀번호 미노출",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "04",
+      "name": "cust2 회원가입",
+      "helper": false,
+      "method": "POST",
+      "status": 200,
+      "outcome": "FAIL",
+      "reason": "expected 200 to be one of [ 201 ]",
+      "checks": [
+        {
+          "name": "04 HTTP 201",
+          "status": "failed",
+          "error": "expected 200 to be one of [ 201 ]"
+        },
+        {
+          "name": "04 비밀번호 미노출",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "05",
+      "name": "중복 아이디 회원가입",
+      "helper": false,
+      "method": "POST",
+      "status": 409,
+      "outcome": "PASS",
+      "reason": "",
+      "checks": [
+        {
+          "name": "05 HTTP 409",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "06",
+      "name": "비밀번호 3자 거절",
+      "helper": false,
+      "method": "POST",
+      "status": 400,
+      "outcome": "PASS",
+      "reason": "",
+      "checks": [
+        {
+          "name": "06 HTTP 400",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "07a",
+      "name": "owner1 로그인 및 토큰 저장",
+      "helper": false,
+      "method": "POST",
+      "status": 200,
+      "outcome": "PASS",
+      "reason": "",
+      "checks": [
+        {
+          "name": "07a HTTP 200",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "07a JWT 발급",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "07b",
+      "name": "owner2 로그인 및 토큰 저장",
+      "helper": false,
+      "method": "POST",
+      "status": 200,
+      "outcome": "PASS",
+      "reason": "",
+      "checks": [
+        {
+          "name": "07b HTTP 200",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "07b JWT 발급",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "07c",
+      "name": "cust1 로그인 및 토큰 저장",
+      "helper": false,
+      "method": "POST",
+      "status": 200,
+      "outcome": "PASS",
+      "reason": "",
+      "checks": [
+        {
+          "name": "07c HTTP 200",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "07c JWT 발급",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "07d",
+      "name": "cust2 로그인 및 토큰 저장",
+      "helper": false,
+      "method": "POST",
+      "status": 200,
+      "outcome": "PASS",
+      "reason": "",
+      "checks": [
+        {
+          "name": "07d HTTP 200",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "07d JWT 발급",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "08",
+      "name": "틀린 비밀번호 로그인",
+      "helper": false,
+      "method": "POST",
+      "status": 401,
+      "outcome": "PASS",
+      "reason": "",
+      "checks": [
+        {
+          "name": "08 HTTP 401",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "09",
+      "name": "토큰 없는 메뉴 등록",
+      "helper": false,
+      "method": "POST",
+      "status": 403,
+      "outcome": "PASS",
+      "reason": "",
+      "checks": [
+        {
+          "name": "09 HTTP 401 / 403",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "name": "CUSTOMER 메뉴 등록 거절",
+      "helper": false,
+      "method": "POST",
+      "status": 403,
+      "outcome": "PASS",
+      "reason": "",
+      "checks": [
+        {
+          "name": "10 HTTP 403",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "11",
+      "name": "owner1 김밥 3000원 등록",
+      "helper": false,
+      "method": "POST",
+      "status": 200,
+      "outcome": "FAIL",
+      "reason": "expected 200 to be one of [ 201 ]",
+      "checks": [
+        {
+          "name": "11 HTTP 201",
+          "status": "failed",
+          "error": "expected 200 to be one of [ 201 ]"
+        },
+        {
+          "name": "11 메뉴 ID 및 가격",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "12",
+      "name": "가격 0원 메뉴 등록 거절",
+      "helper": false,
+      "method": "POST",
+      "status": 400,
+      "outcome": "PASS",
+      "reason": "",
+      "checks": [
+        {
+          "name": "12 HTTP 400",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "13",
+      "name": "비로그인 메뉴 목록",
+      "helper": false,
+      "method": "GET",
+      "status": 200,
+      "outcome": "PASS",
+      "reason": "",
+      "checks": [
+        {
+          "name": "13 HTTP 200",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "13 김밥 노출",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "14a",
+      "name": "비로그인 김밥 단건 조회",
+      "helper": false,
+      "method": "GET",
+      "status": 403,
+      "outcome": "FAIL",
+      "reason": "expected 403 to be one of [ 200 ]; expected undefined to deeply equal 1",
+      "checks": [
+        {
+          "name": "14a HTTP 200",
+          "status": "failed",
+          "error": "expected 403 to be one of [ 200 ]"
+        },
+        {
+          "name": "14a 메뉴 일치",
+          "status": "failed",
+          "error": "expected undefined to deeply equal 1"
+        }
+      ]
+    },
+    {
+      "id": "14b",
+      "name": "비로그인 없는 메뉴 조회",
+      "helper": false,
+      "method": "GET",
+      "status": 403,
+      "outcome": "FAIL",
+      "reason": "expected 403 to be one of [ 404 ]",
+      "checks": [
+        {
+          "name": "14b HTTP 404",
+          "status": "failed",
+          "error": "expected 403 to be one of [ 404 ]"
+        }
+      ]
+    },
+    {
+      "id": "15",
+      "name": "다른 OWNER 메뉴 수정 거절",
+      "helper": false,
+      "method": "PUT",
+      "status": 403,
+      "outcome": "PASS",
+      "reason": "",
+      "checks": [
+        {
+          "name": "15 HTTP 403",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "16",
+      "name": "본인 김밥 가격 3500원 수정",
+      "helper": false,
+      "method": "PUT",
+      "status": 200,
+      "outcome": "PASS",
+      "reason": "",
+      "checks": [
+        {
+          "name": "16 HTTP 200",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "16 가격 3500원",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "17",
+      "name": "OWNER 주문 생성 거절",
+      "helper": false,
+      "method": "POST",
+      "status": 500,
+      "outcome": "FAIL",
+      "reason": "expected 500 to be one of [ 403 ]",
+      "checks": [
+        {
+          "name": "17 HTTP 403",
+          "status": "failed",
+          "error": "expected 500 to be one of [ 403 ]"
+        }
+      ]
+    },
+    {
+      "id": "18",
+      "name": "cust1 김밥 2개 주문",
+      "helper": false,
+      "method": "POST",
+      "status": 500,
+      "outcome": "FAIL",
+      "reason": "expected 500 to be one of [ 201 ]; expected undefined to deeply equal 7000; expected undefined to be a number",
+      "checks": [
+        {
+          "name": "18 HTTP 201",
+          "status": "failed",
+          "error": "expected 500 to be one of [ 201 ]"
+        },
+        {
+          "name": "18 총액 7000원 · ORDERED",
+          "status": "failed",
+          "error": "expected undefined to deeply equal 7000"
+        },
+        {
+          "name": "18 생성된 주문 ID 반환",
+          "status": "failed",
+          "error": "expected undefined to be a number"
+        }
+      ]
+    },
+    {
+      "id": "18H",
+      "name": "보조: 생성 응답 ID 누락 시 목록에서 확인",
+      "helper": true,
+      "method": "GET",
+      "status": null,
+      "outcome": "BLOCKED",
+      "reason": "18H BLOCKED: 선행 조건 미충족: orderCreated",
+      "checks": [
+        {
+          "name": "18H BLOCKED: 선행 조건 미충족: orderCreated",
+          "status": "skipped",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "19",
+      "name": "수량 0 주문 거절",
+      "helper": false,
+      "method": "POST",
+      "status": 500,
+      "outcome": "FAIL",
+      "reason": "expected 500 to be one of [ 400 ]",
+      "checks": [
+        {
+          "name": "19 HTTP 400",
+          "status": "failed",
+          "error": "expected 500 to be one of [ 400 ]"
+        }
+      ]
+    },
+    {
+      "id": "20a",
+      "name": "cust1 주문 목록 범위",
+      "helper": false,
+      "method": "GET",
+      "status": 200,
+      "outcome": "FAIL",
+      "reason": "expected [] to have a length of 1 but got +0",
+      "checks": [
+        {
+          "name": "20a HTTP 200",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "20a 주문 1건",
+          "status": "failed",
+          "error": "expected [] to have a length of 1 but got +0"
+        },
+        {
+          "name": "20a 이번 메뉴만 조회",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "20b",
+      "name": "cust2 주문 목록 범위",
+      "helper": false,
+      "method": "GET",
+      "status": 200,
+      "outcome": "PASS",
+      "reason": "",
+      "checks": [
+        {
+          "name": "20b HTTP 200",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "20b 주문 0건",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "21a",
+      "name": "owner1 주문 목록 범위",
+      "helper": false,
+      "method": "GET",
+      "status": 200,
+      "outcome": "FAIL",
+      "reason": "expected [] to have a length of 1 but got +0",
+      "checks": [
+        {
+          "name": "21a HTTP 200",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "21a 주문 1건",
+          "status": "failed",
+          "error": "expected [] to have a length of 1 but got +0"
+        },
+        {
+          "name": "21a 이번 메뉴만 조회",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "21b",
+      "name": "owner2 주문 목록 범위",
+      "helper": false,
+      "method": "GET",
+      "status": 200,
+      "outcome": "PASS",
+      "reason": "",
+      "checks": [
+        {
+          "name": "21b HTTP 200",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "21b 주문 0건",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "22",
+      "name": "결제 전 주문 수락 거절",
+      "helper": false,
+      "method": "PATCH",
+      "status": null,
+      "outcome": "BLOCKED",
+      "reason": "22 BLOCKED: 선행 조건 미충족: orderId",
+      "checks": [
+        {
+          "name": "22 BLOCKED: 선행 조건 미충족: orderId",
+          "status": "skipped",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "23",
+      "name": "남의 주문 결제 거절",
+      "helper": false,
+      "method": "POST",
+      "status": null,
+      "outcome": "NOT_IMPLEMENTED",
+      "reason": "23 NOT_IMPLEMENTED: 결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.",
+      "checks": [
+        {
+          "name": "23 NOT_IMPLEMENTED: 결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.",
+          "status": "skipped",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "24",
+      "name": "cust1 카드 결제",
+      "helper": false,
+      "method": "POST",
+      "status": null,
+      "outcome": "NOT_IMPLEMENTED",
+      "reason": "24 NOT_IMPLEMENTED: 결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.",
+      "checks": [
+        {
+          "name": "24 NOT_IMPLEMENTED: 결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.",
+          "status": "skipped",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "25",
+      "name": "동일 주문 재결제 거절",
+      "helper": false,
+      "method": "POST",
+      "status": null,
+      "outcome": "NOT_IMPLEMENTED",
+      "reason": "25 NOT_IMPLEMENTED: 결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.",
+      "checks": [
+        {
+          "name": "25 NOT_IMPLEMENTED: 결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.",
+          "status": "skipped",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "26",
+      "name": "결제 후 주문 취소 거절",
+      "helper": false,
+      "method": "PUT",
+      "status": null,
+      "outcome": "BLOCKED",
+      "reason": "26 BLOCKED: 선행 조건 미충족: orderId, paid",
+      "checks": [
+        {
+          "name": "26 BLOCKED: 선행 조건 미충족: orderId, paid",
+          "status": "skipped",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "27",
+      "name": "다른 OWNER 주문 수락 거절",
+      "helper": false,
+      "method": "PATCH",
+      "status": null,
+      "outcome": "BLOCKED",
+      "reason": "27 BLOCKED: 선행 조건 미충족: orderId, paid",
+      "checks": [
+        {
+          "name": "27 BLOCKED: 선행 조건 미충족: orderId, paid",
+          "status": "skipped",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "28a",
+      "name": "본인 주문 수락",
+      "helper": false,
+      "method": "PATCH",
+      "status": null,
+      "outcome": "BLOCKED",
+      "reason": "28a BLOCKED: 선행 조건 미충족: orderId, paid",
+      "checks": [
+        {
+          "name": "28a BLOCKED: 선행 조건 미충족: orderId, paid",
+          "status": "skipped",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "28aH",
+      "name": "보조: 주문수락 저장 확인",
+      "helper": true,
+      "method": "GET",
+      "status": null,
+      "outcome": "BLOCKED",
+      "reason": "28aH BLOCKED: 선행 조건 미충족: orderId, accepted",
+      "checks": [
+        {
+          "name": "28aH BLOCKED: 선행 조건 미충족: orderId, accepted",
+          "status": "skipped",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "28b",
+      "name": "본인 주문 배달완료",
+      "helper": false,
+      "method": "PATCH",
+      "status": null,
+      "outcome": "BLOCKED",
+      "reason": "28b BLOCKED: 선행 조건 미충족: orderId, accepted",
+      "checks": [
+        {
+          "name": "28b BLOCKED: 선행 조건 미충족: orderId, accepted",
+          "status": "skipped",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "28bH",
+      "name": "보조: 배달완료 저장 확인",
+      "helper": true,
+      "method": "GET",
+      "status": null,
+      "outcome": "BLOCKED",
+      "reason": "28bH BLOCKED: 선행 조건 미충족: orderId, completed",
+      "checks": [
+        {
+          "name": "28bH BLOCKED: 선행 조건 미충족: orderId, completed",
+          "status": "skipped",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "29",
+      "name": "배달완료 후 재수락 거절",
+      "helper": false,
+      "method": "PATCH",
+      "status": null,
+      "outcome": "BLOCKED",
+      "reason": "29 BLOCKED: 선행 조건 미충족: orderId, completed",
+      "checks": [
+        {
+          "name": "29 BLOCKED: 선행 조건 미충족: orderId, completed",
+          "status": "skipped",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "30",
+      "name": "취소용 새 주문 1개",
+      "helper": false,
+      "method": "POST",
+      "status": 500,
+      "outcome": "FAIL",
+      "reason": "expected 500 to be one of [ 201 ]; expected undefined to deeply equal 'ORDERED'",
+      "checks": [
+        {
+          "name": "30 HTTP 201",
+          "status": "failed",
+          "error": "expected 500 to be one of [ 201 ]"
+        },
+        {
+          "name": "30 ORDERED · 3500원",
+          "status": "failed",
+          "error": "expected undefined to deeply equal 'ORDERED'"
+        }
+      ]
+    },
+    {
+      "id": "30H",
+      "name": "보조: 취소할 주문 ID 확인",
+      "helper": true,
+      "method": "GET",
+      "status": null,
+      "outcome": "BLOCKED",
+      "reason": "30H BLOCKED: 선행 조건 미충족: cancelOrderCreated",
+      "checks": [
+        {
+          "name": "30H BLOCKED: 선행 조건 미충족: cancelOrderCreated",
+          "status": "skipped",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "31",
+      "name": "다른 CUSTOMER 주문 취소 거절",
+      "helper": false,
+      "method": "PUT",
+      "status": null,
+      "outcome": "BLOCKED",
+      "reason": "31 BLOCKED: 선행 조건 미충족: cancelOrderId",
+      "checks": [
+        {
+          "name": "31 BLOCKED: 선행 조건 미충족: cancelOrderId",
+          "status": "skipped",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "32",
+      "name": "본인 ORDERED 주문 취소",
+      "helper": false,
+      "method": "PUT",
+      "status": null,
+      "outcome": "BLOCKED",
+      "reason": "32 BLOCKED: 선행 조건 미충족: cancelOrderId",
+      "checks": [
+        {
+          "name": "32 BLOCKED: 선행 조건 미충족: cancelOrderId",
+          "status": "skipped",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "32H",
+      "name": "보조: 주문취소 저장 확인",
+      "helper": true,
+      "method": "GET",
+      "status": null,
+      "outcome": "BLOCKED",
+      "reason": "32H BLOCKED: 선행 조건 미충족: cancelOrderId, canceled",
+      "checks": [
+        {
+          "name": "32H BLOCKED: 선행 조건 미충족: cancelOrderId, canceled",
+          "status": "skipped",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "33",
+      "name": "취소된 주문 결제 거절",
+      "helper": false,
+      "method": "POST",
+      "status": null,
+      "outcome": "NOT_IMPLEMENTED",
+      "reason": "33 NOT_IMPLEMENTED: 결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.",
+      "checks": [
+        {
+          "name": "33 NOT_IMPLEMENTED: 결제 API 미구현. 구현 후 paymentEnabled와 결제 요청 경로를 설정하세요.",
+          "status": "skipped",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "34",
+      "name": "다른 OWNER 메뉴 삭제 거절",
+      "helper": false,
+      "method": "DELETE",
+      "status": 403,
+      "outcome": "PASS",
+      "reason": "",
+      "checks": [
+        {
+          "name": "34 HTTP 403",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "35",
+      "name": "본인 메뉴 Soft Delete",
+      "helper": false,
+      "method": "DELETE",
+      "status": 204,
+      "outcome": "PASS",
+      "reason": "",
+      "checks": [
+        {
+          "name": "35 HTTP 200 / 204",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "36",
+      "name": "삭제 후 메뉴 목록에서 제외",
+      "helper": false,
+      "method": "GET",
+      "status": 200,
+      "outcome": "PASS",
+      "reason": "",
+      "checks": [
+        {
+          "name": "36 HTTP 200",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "36 김밥 제외",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "37",
+      "name": "삭제된 메뉴 단건 조회 거절",
+      "helper": false,
+      "method": "GET",
+      "status": 200,
+      "outcome": "FAIL",
+      "reason": "expected 200 to be one of [ 404 ]",
+      "checks": [
+        {
+          "name": "37 HTTP 404",
+          "status": "failed",
+          "error": "expected 200 to be one of [ 404 ]"
+        }
+      ]
+    },
+    {
+      "id": "38",
+      "name": "삭제된 메뉴 주문 거절",
+      "helper": false,
+      "method": "POST",
+      "status": 500,
+      "outcome": "FAIL",
+      "reason": "expected 500 to be one of [ 404 ]",
+      "checks": [
+        {
+          "name": "38 HTTP 404",
+          "status": "failed",
+          "error": "expected 500 to be one of [ 404 ]"
+        }
+      ]
+    },
+    {
+      "id": "39a",
+      "name": "cust1 삭제 메뉴의 기존 주문 유지",
+      "helper": false,
+      "method": "GET",
+      "status": null,
+      "outcome": "BLOCKED",
+      "reason": "39a BLOCKED: 선행 조건 미충족: orderId, cancelOrderId",
+      "checks": [
+        {
+          "name": "39a BLOCKED: 선행 조건 미충족: orderId, cancelOrderId",
+          "status": "skipped",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "39b",
+      "name": "owner1 삭제 메뉴의 기존 주문 유지",
+      "helper": false,
+      "method": "GET",
+      "status": null,
+      "outcome": "BLOCKED",
+      "reason": "39b BLOCKED: 선행 조건 미충족: orderId, cancelOrderId",
+      "checks": [
+        {
+          "name": "39b BLOCKED: 선행 조건 미충족: orderId, cancelOrderId",
+          "status": "skipped",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "99",
+      "name": "보조: 실행 결과 집계 (읽기 전용)",
+      "helper": true,
+      "method": "GET",
+      "status": 200,
+      "outcome": "PASS",
+      "reason": "",
+      "checks": [
+        {
+          "name": "99 HTTP 200",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    }
+  ]
+}

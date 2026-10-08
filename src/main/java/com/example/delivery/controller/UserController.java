@@ -5,6 +5,7 @@ import com.example.delivery.dto.user.UserResponseDto;
 import com.example.delivery.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +23,8 @@ public class UserController {
     // 비밀번호는 BCrypt로 암호화
     @PostMapping("/api/users/registry")
     public ResponseEntity<UserResponseDto> register(@Valid @RequestBody UserRequestDto userRequestDto){
-        return ResponseEntity.ok(userService.register(userRequestDto));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(userService.register(userRequestDto));
     }
 
 //    Spring Security Filter 영역에서 컨트롤 하므로 제거

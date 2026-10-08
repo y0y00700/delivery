@@ -8,6 +8,7 @@ import com.example.delivery.security.UserDetailsImpl;
 import com.example.delivery.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,8 @@ public class OrderController {
     @PostMapping("/api/order/")
     public ResponseEntity<ResponseOrderCreateDto> createOrder(@Valid @RequestBody RequestOrderCreateDto requestOrderCreateDto
                                                             , @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return ResponseEntity.ok(orderService.createOrder(requestOrderCreateDto,userDetails.getUsername()));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(orderService.createOrder(requestOrderCreateDto, userDetails.getUsername()));
     }
 
     // 주문 목록 조회

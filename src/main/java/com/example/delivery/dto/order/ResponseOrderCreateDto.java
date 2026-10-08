@@ -9,13 +9,15 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ResponseOrderCreateDto {
+    private Long orderId;
     private Long menuId;
     private OrderStatus orderStatus;
     private Long quantity;
     private String deliveryAddr;
     private Long orderPrice;
 
-    public ResponseOrderCreateDto(Long menuId, OrderStatus orderStatus, Long quantity, String deliveryAddr, Long orderPrice) {
+    public ResponseOrderCreateDto(Long orderId, Long menuId, OrderStatus orderStatus, Long quantity, String deliveryAddr, Long orderPrice) {
+        this.orderId = orderId;
         this.menuId = menuId;
         this.orderStatus = orderStatus;
         this.quantity = quantity;

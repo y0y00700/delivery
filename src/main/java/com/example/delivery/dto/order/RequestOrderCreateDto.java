@@ -1,24 +1,21 @@
 package com.example.delivery.dto.order;
 
-import com.example.delivery.entity.Menu;
-import com.example.delivery.entity.OrderStatus;
-import com.example.delivery.entity.User;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
 
 @Getter
 @NoArgsConstructor
 public class RequestOrderCreateDto {
-    @NotBlank
+    @NotNull(message = "메뉴 ID는 필수입니다.")
     private Long menuId;
-    @Enumerated(EnumType.STRING)
-    private OrderStatus orderStatus;
-    @NotBlank @Min(value = 1,message = "최소주문 수량은 1입니다.")
+
+    @NotNull(message = "주문 수량은 필수입니다.")
+    @Min(value = 1, message = "최소 주문 수량은 1입니다.")
     private Long quantity;
-    @NotBlank
+
+    @NotBlank(message = "배달 주소는 필수입니다.")
     private String deliveryAddr;
 }

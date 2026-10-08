@@ -84,10 +84,7 @@ public class MenuService {
     // 메뉴 단건 조회
     @Transactional
     public ResponseMenuListDto searchMenuOne(Long menuId) {
-        // orElseThrow 에 https 404 코드 추가
-        Menu menu = menuRepository.findById(menuId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND,"해당 메뉴가 존재하지 않습니다.")
-        );
+        Menu menu = findActiveMenu(menuId);
 
         return new ResponseMenuListDto(
                 menu.getMenuId(),
@@ -114,11 +111,7 @@ public class MenuService {
         }
 
 
-        Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "해당 메뉴가 존재하지 않습니다."
-                ));
+        Menu menu = findActiveMenu(menuId);
 
         // 본인 메뉴만 수정 가능
         if (!menu.getOwnerId().getUserId().equals(owner.getUserId())) {
@@ -164,13 +157,19 @@ public class MenuService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "사장님만 메뉴를 삭제 할 수 있습니다.");
         }
 
-        Menu menu = menuRepository.findById(menuId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND , "해당 메뉴가 존재하지 않습니다.")
-        );
+        Menu menu = findActiveMenu(menuId);
 
         if(!menu.getOwnerId().getUserId().equals(owner.getUserId())){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN , "본인의 메뉴만 삭제 할 수 있습니다.");
         }
         menu.softDelete();
+    }
+
+    private Menu findActiveMenu(Long menuId) {
+        return menuRepository.findByMenuIdAndDeletedAtIsNull(menuId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "해당 메뉴가 존재하지 않습니다."
+                ));
     }
 }

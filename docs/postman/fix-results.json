@@ -1,0 +1,744 @@
+{
+  "tool": "Postman CLI 1.70.0",
+  "startedAt": "2026-10-08T17:02:18.818000+09:00",
+  "runId": "p51_muz90k12",
+  "scope": "Changed behavior and prerequisites; no payment, cancel, or status-transition requests",
+  "environment": {
+    "baseUrl": "http://localhost:8080",
+    "database": "PostgreSQL 18.6",
+    "container": "delivery-db",
+    "java": "21.0.12.1",
+    "springBoot": "4.1.1"
+  },
+  "nativeSummary": {
+    "iterations": {
+      "executed": 1,
+      "errors": 0
+    },
+    "executedRequests": {
+      "executed": 40,
+      "errors": 0
+    },
+    "prerequestScripts": {
+      "executed": 40,
+      "errors": 0
+    },
+    "postresponseScripts": {
+      "executed": 40,
+      "errors": 0
+    },
+    "tests": {
+      "executed": 67,
+      "failed": 0,
+      "passed": 67,
+      "skipped": 0
+    },
+    "timeStats": {
+      "responseAverage": 90.27499999999998,
+      "responseMin": 15,
+      "responseMax": 1251,
+      "responseStandardDeviation": 200.78807079854127
+    }
+  },
+  "runError": null,
+  "requestOutcomes": {
+    "PASS": 40
+  },
+  "requests": [
+    {
+      "id": "01",
+      "name": "owner1 회원가입",
+      "method": "POST",
+      "status": 201,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "01 HTTP 201",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "01 비밀번호 미노출",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "name": "owner2 회원가입",
+      "method": "POST",
+      "status": 201,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "02 HTTP 201",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "02 비밀번호 미노출",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "name": "cust1 회원가입",
+      "method": "POST",
+      "status": 201,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "03 HTTP 201",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "03 비밀번호 미노출",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "04",
+      "name": "cust2 회원가입",
+      "method": "POST",
+      "status": 201,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "04 HTTP 201",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "04 비밀번호 미노출",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "07a",
+      "name": "owner1 로그인 및 토큰 저장",
+      "method": "POST",
+      "status": 200,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "07a HTTP 200",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "07a JWT 발급",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "07b",
+      "name": "owner2 로그인 및 토큰 저장",
+      "method": "POST",
+      "status": 200,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "07b HTTP 200",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "07b JWT 발급",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "07c",
+      "name": "cust1 로그인 및 토큰 저장",
+      "method": "POST",
+      "status": 200,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "07c HTTP 200",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "07c JWT 발급",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "07d",
+      "name": "cust2 로그인 및 토큰 저장",
+      "method": "POST",
+      "status": 200,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "07d HTTP 200",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "07d JWT 발급",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "09",
+      "name": "토큰 없는 메뉴 등록",
+      "method": "POST",
+      "status": 403,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "09 HTTP 401 / 403",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "11",
+      "name": "owner1 김밥 3000원 등록",
+      "method": "POST",
+      "status": 201,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "11 HTTP 201",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "11 메뉴 ID 및 가격",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "14a",
+      "name": "비로그인 김밥 단건 조회",
+      "method": "GET",
+      "status": 200,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "14a HTTP 200",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "14a 메뉴 일치",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "14b",
+      "name": "비로그인 없는 메뉴 조회",
+      "method": "GET",
+      "status": 404,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "14b HTTP 404",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "15",
+      "name": "다른 OWNER 메뉴 수정 거절",
+      "method": "PUT",
+      "status": 403,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "15 HTTP 403",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "16",
+      "name": "본인 김밥 가격 3500원 수정",
+      "method": "PUT",
+      "status": 200,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "16 HTTP 200",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "16 가격 3500원",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "17",
+      "name": "OWNER 주문 생성 거절",
+      "method": "POST",
+      "status": 403,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "17 HTTP 403",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "18",
+      "name": "cust1 김밥 2개 주문",
+      "method": "POST",
+      "status": 201,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "18 HTTP 201",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "18 총액 7000원 · ORDERED",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "18 생성된 주문 ID 반환",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "18 주문 ID 양의 정수 · 메뉴 · 수량 · 주소",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "19",
+      "name": "수량 0 주문 거절",
+      "method": "POST",
+      "status": 400,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "19 HTTP 400",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "V1",
+      "name": "menuId 누락 거절",
+      "method": "POST",
+      "status": 400,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "V1 HTTP 400",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "V2",
+      "name": "menuId null 거절",
+      "method": "POST",
+      "status": 400,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "V2 HTTP 400",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "V3",
+      "name": "quantity 누락 거절",
+      "method": "POST",
+      "status": 400,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "V3 HTTP 400",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "V4",
+      "name": "quantity null 거절",
+      "method": "POST",
+      "status": 400,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "V4 HTTP 400",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "V5",
+      "name": "음수 수량 거절",
+      "method": "POST",
+      "status": 400,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "V5 HTTP 400",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "V6",
+      "name": "주소 누락 거절",
+      "method": "POST",
+      "status": 400,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "V6 HTTP 400",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "V7",
+      "name": "주소 null 거절",
+      "method": "POST",
+      "status": 400,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "V7 HTTP 400",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "V8",
+      "name": "공백 주소 거절",
+      "method": "POST",
+      "status": 400,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "V8 HTTP 400",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "V9",
+      "name": "없는 메뉴 주문 거절",
+      "method": "POST",
+      "status": 404,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "V9 HTTP 404",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "20a",
+      "name": "cust1 주문 목록 범위",
+      "method": "GET",
+      "status": 200,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "20a HTTP 200",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "20a 주문 1건",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "20a 이번 메뉴만 조회",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "20b",
+      "name": "cust2 주문 목록 범위",
+      "method": "GET",
+      "status": 200,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "20b HTTP 200",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "20b 주문 0건",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "21a",
+      "name": "owner1 주문 목록 범위",
+      "method": "GET",
+      "status": 200,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "21a HTTP 200",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "21a 주문 1건",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "21a 이번 메뉴만 조회",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "21b",
+      "name": "owner2 주문 목록 범위",
+      "method": "GET",
+      "status": 200,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "21b HTTP 200",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "21b 주문 0건",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "30",
+      "name": "취소용 새 주문 1개",
+      "method": "POST",
+      "status": 201,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "30 HTTP 201",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "30 ORDERED · 3500원",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "30 주문 ID 양의 정수 · 메뉴 · 수량 · 주소",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "30 두 주문의 ID 구분",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "34",
+      "name": "다른 OWNER 메뉴 삭제 거절",
+      "method": "DELETE",
+      "status": 403,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "34 HTTP 403",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "35",
+      "name": "본인 메뉴 Soft Delete",
+      "method": "DELETE",
+      "status": 204,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "35 HTTP 200 / 204",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "37",
+      "name": "삭제된 메뉴 단건 조회 거절",
+      "method": "GET",
+      "status": 404,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "37 HTTP 404",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "D1",
+      "name": "비로그인 삭제 메뉴 조회 거절",
+      "method": "GET",
+      "status": 404,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "D1 HTTP 404",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "D2",
+      "name": "삭제 메뉴 수정 거절",
+      "method": "PUT",
+      "status": 404,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "D2 HTTP 404",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "D3",
+      "name": "삭제 메뉴 재삭제 거절",
+      "method": "DELETE",
+      "status": 404,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "D3 HTTP 404",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "38",
+      "name": "삭제된 메뉴 주문 거절",
+      "method": "POST",
+      "status": 404,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "38 HTTP 404",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "39a",
+      "name": "cust1 삭제 메뉴의 기존 주문 유지",
+      "method": "GET",
+      "status": 200,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "39a HTTP 200",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "39a 기존 주문 2건 유지",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "39a 삭제 후 주문 상태 · 금액 · 수량 보존",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "39b",
+      "name": "owner1 삭제 메뉴의 기존 주문 유지",
+      "method": "GET",
+      "status": 200,
+      "outcome": "PASS",
+      "checks": [
+        {
+          "name": "39b HTTP 200",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "39b 기존 주문 2건 유지",
+          "status": "passed",
+          "error": null
+        },
+        {
+          "name": "39b 삭제 후 주문 상태 · 금액 · 수량 보존",
+          "status": "passed",
+          "error": null
+        }
+      ]
+    }
+  ]
+}

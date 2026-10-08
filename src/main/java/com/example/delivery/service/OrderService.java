@@ -50,18 +50,19 @@ public class OrderService {
             menu,
             OrderStatus.ORDERED,
             requestOrderCreateDto.getQuantity(),
-   requestOrderCreateDto.getQuantity() * menu.getPrice(),
+            requestOrderCreateDto.getQuantity() * menu.getPrice(),
             requestOrderCreateDto.getDeliveryAddr()
         );
 
-        orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
 
         return new ResponseOrderCreateDto(
-                order.getMenuId().getMenuId(),
-                order.getOrderStatus(),
-                order.getQuantity(),
-                order.getDeliveryAddr(),
-                order.getOrderPrice()
+                savedOrder.getOrderId(),
+                savedOrder.getMenuId().getMenuId(),
+                savedOrder.getOrderStatus(),
+                savedOrder.getQuantity(),
+                savedOrder.getDeliveryAddr(),
+                savedOrder.getOrderPrice()
         );
     }
 
