@@ -20,17 +20,29 @@ public class Order extends BaseEntity {
     private Menu menuId;
     @Enumerated(EnumType.STRING)
     @Column(length = 10, nullable = false)
-    private OrderStatus orderStatus = OrderStatus.ORDERED;
+    private OrderStatus orderStatus;
     @Column(nullable = false)
     private Long quantity;
     @Column(nullable = false)
     private Long orderPrice;
+    @Column(nullable = false)
+    private String deliveryAddr;
 
-    public Order(User odererId, Menu menuId, Long quantity, Long orderPrice) {
+
+    public Order(User odererId, Menu menuId, OrderStatus orderStatus,Long quantity, Long orderPrice, String deliveryAddr) {
         this.odererId = odererId;
         this.menuId = menuId;
+        this.orderStatus = orderStatus;
         this.quantity = quantity;
         this.orderPrice = orderPrice;
+        this.deliveryAddr = deliveryAddr;
     }
 
+    public void cancel() {
+        this.orderStatus = OrderStatus.CANCELED;
+    }
+
+    public void updateStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+    }
 }

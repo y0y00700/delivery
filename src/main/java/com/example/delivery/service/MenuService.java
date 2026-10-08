@@ -67,7 +67,7 @@ public class MenuService {
     // 삭제된 메뉴 빼고 보여준다.
     @Transactional
     public List<ResponseMenuListDto> searchMenuAll() {
-        List<Menu> menus = menuRepository.findAll();
+        List<Menu> menus = menuRepository.findAllByDeletedAtIsNull();
         List<ResponseMenuListDto> rmlds = new ArrayList<>();
         for(Menu m : menus){
             ResponseMenuListDto rmld = new ResponseMenuListDto(

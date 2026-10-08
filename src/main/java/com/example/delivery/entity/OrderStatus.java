@@ -15,6 +15,8 @@ public enum OrderStatus {
 
     private final String description;
 
+
+    // 주문 상태 흐름 변경 금지 관련 메서드
     public boolean canTransitionTo(OrderStatus nextStatus) {
         if (nextStatus == null) {
             return false;

@@ -28,7 +28,7 @@ public class WebSecurityConfig {
         this.userDetailsService = userDetailsService;
         this.authenticationConfiguration = authenticationConfiguration;
     }
-
+// AuthenticationManager 및 JWT(JwtAuthenticationFilter,JwtAuthorizationFilter) Filter Bean 등록
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
@@ -70,6 +70,7 @@ public class WebSecurityConfig {
 //        );
 
         // 필터 관리
+        // 순서 관리  Filter Chaninng 순서를  jwtAuthorizationFilter -> JwtAuthenticationFilter ->  UsernamePasswordAuthenticationFilter 순서로 진행
         http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
